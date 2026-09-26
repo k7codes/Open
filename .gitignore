@@ -1,0 +1,29 @@
+# Build and publish output
+bin/
+obj/
+publish/
+publish-*/
+
+# Visual Studio and user-specific files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Local app data and biometric/person records
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.bak
+photos/
+data/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+Thumbs.db
+Desktop.ini

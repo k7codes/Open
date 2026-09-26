@@ -1,0 +1,126 @@
+<Window x:Class="OpenFaceRegistry.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Open · Fotoğraf Eşleştirme" Height="820" Width="1280"
+        MinHeight="720" MinWidth="1080" WindowStartupLocation="CenterScreen"
+        Background="#F4F6FA" FontFamily="Segoe UI" Foreground="#172033">
+    <Window.Resources>
+        <SolidColorBrush x:Key="Accent" Color="#4F46E5"/>
+        <SolidColorBrush x:Key="Muted" Color="#667085"/>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="14,10"/><Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/><Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="#E9EAFB"/><Setter Property="Foreground" Value="#3730A3"/>
+        </Style>
+        <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="#4F46E5"/><Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="10,8"/><Setter Property="BorderBrush" Value="#D8DDEA"/>
+            <Setter Property="BorderThickness" Value="1"/><Setter Property="Background" Value="White"/>
+        </Style>
+        <Storyboard x:Key="ScanStoryboard" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="ScanLine" Storyboard.TargetProperty="(Canvas.Top)"
+                             From="8" To="268" Duration="0:0:1.5" AutoReverse="True"/>
+            <DoubleAnimation Storyboard.TargetName="ScanGlow" Storyboard.TargetProperty="Opacity"
+                             From="0.2" To="0.8" Duration="0:0:0.75" AutoReverse="True"/>
+        </Storyboard>
+    </Window.Resources>
+    <Grid Margin="24">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" Margin="0,0,0,18">
+            <Border Width="44" Height="44" CornerRadius="13" Background="#4F46E5" DockPanel.Dock="Left" Margin="0,0,12,0">
+                <TextBlock Text="O" Foreground="White" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Open" FontSize="24" FontWeight="Bold"/>
+                <TextBlock Text="Fotoğraftan kişi eşleştirme" Foreground="{StaticResource Muted}" Margin="0,2,0,0"/>
+            </StackPanel>
+            <Button Content="Kişi kayıtlarını yönet  →" Style="{StaticResource {x:Type Button}}" DockPanel.Dock="Right" Click="OpenPeople_Click"/>
+        </DockPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="1.05*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="0.95*"/></Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Background="White" CornerRadius="14" Padding="20" BorderBrush="#E5E8F0" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <DockPanel Margin="0,0,0,14">
+                        <Border Width="30" Height="30" CornerRadius="9" Background="#EEF2FF" DockPanel.Dock="Left" Margin="0,0,10,0">
+                            <TextBlock Text="1" Foreground="#4F46E5" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center"><TextBlock Text="Fotoğrafı yükle" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="JPG, PNG, BMP, TIFF ve desteklenen diğer görüntüler" Foreground="{StaticResource Muted}" FontSize="12" Margin="0,3,0,0"/></StackPanel>
+                    </DockPanel>
+                    <Border Grid.Row="1" Background="#F8FAFC" BorderBrush="#D8DDEA" BorderThickness="1" CornerRadius="12" ClipToBounds="True" AllowDrop="True" DragOver="PhotoPanel_DragOver" Drop="PhotoPanel_Drop">
+                        <Grid>
+                            <Image x:Name="QueryImage" Stretch="Uniform" Visibility="Collapsed"/>
+                            <StackPanel x:Name="PhotoPlaceholder" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Border Width="72" Height="72" CornerRadius="20" Background="#EEF2FF" HorizontalAlignment="Center" Margin="0,0,0,14">
+                                    <TextBlock Text="↑" FontSize="38" Foreground="#4F46E5" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-7,0,0"/>
+                                </Border>
+                                <TextBlock Text="Fotoğrafı buraya bırak" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="veya aşağıdaki düğmeyle bilgisayarından seç" Foreground="{StaticResource Muted}" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                            <Border x:Name="ImageTag" Visibility="Collapsed" Background="#CC111827" CornerRadius="6" Padding="9,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="12">
+                                <TextBlock x:Name="SelectedFileText" Foreground="White" TextTrimming="CharacterEllipsis" MaxWidth="440"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <DockPanel Grid.Row="2" Margin="0,14,0,0">
+                        <Button x:Name="ScanButton" Content="Fotoğraf seç" Style="{StaticResource PrimaryButton}" Click="SelectPhoto_Click"/>
+                        <Button x:Name="RunScanButton" Content="Eşleşme ara" Style="{StaticResource PrimaryButton}" Margin="10,0,0,0" IsEnabled="False" Click="SearchFace_Click"/>
+                        <TextBlock x:Name="FileHint" Text="Henüz fotoğraf seçilmedi" Foreground="{StaticResource Muted}" VerticalAlignment="Center" Margin="12,0,0,0" TextTrimming="CharacterEllipsis"/>
+                    </DockPanel>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2" Background="White" CornerRadius="14" Padding="20" BorderBrush="#E5E8F0" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="300"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <DockPanel Margin="0,0,0,12">
+                        <Border Width="30" Height="30" CornerRadius="9" Background="#ECFDF3" DockPanel.Dock="Left" Margin="0,0,10,0">
+                            <TextBlock Text="2" Foreground="#039855" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center"><TextBlock Text="Tarama ve sonuç" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Fotoğraf yerel kayıtlarla karşılaştırılır" Foreground="{StaticResource Muted}" FontSize="12" Margin="0,3,0,0"/></StackPanel>
+                    </DockPanel>
+                    <Border Grid.Row="1" Background="#111827" CornerRadius="12" ClipToBounds="True">
+                        <Grid>
+                            <Canvas Width="280" Height="280" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Ellipse Canvas.Left="12" Canvas.Top="12" Width="256" Height="256" Stroke="#26354C" StrokeThickness="1"/>
+                                <Ellipse Canvas.Left="30" Canvas.Top="30" Width="220" Height="220" Stroke="#31445F" StrokeThickness="1" StrokeDashArray="2,4"/>
+                                <Ellipse Canvas.Left="48" Canvas.Top="48" Width="184" Height="184" Stroke="#4F46E5" StrokeThickness="1" Opacity="0.45"/>
+                                <Path Data="M 101,107 C 101,77 120,61 140,61 C 160,61 179,77 179,107 L 179,137 C 179,160 161,177 140,177 C 119,177 101,160 101,137 Z" Stroke="#C7D2FE" StrokeThickness="2" Fill="#1E2A3A"/>
+                                <Ellipse Canvas.Left="119" Canvas.Top="106" Width="5" Height="5" Fill="#A5B4FC"/>
+                                <Ellipse Canvas.Left="156" Canvas.Top="106" Width="5" Height="5" Fill="#A5B4FC"/>
+                                <Path Data="M 128,143 Q 140,151 152,143" Stroke="#A5B4FC" StrokeThickness="2"/>
+                                <Border x:Name="ScanGlow" Canvas.Left="24" Canvas.Top="8" Width="232" Height="12" Background="#4F46E5" Opacity="0"/>
+                                <Border x:Name="ScanLine" Canvas.Left="24" Canvas.Top="8" Width="232" Height="2" Background="#A5B4FC" Visibility="Collapsed"/>
+                                <TextBlock Canvas.Left="82" Canvas.Top="242" Text="OPEN  /  LOCAL SCAN" Foreground="#A5B4FC" FontFamily="Consolas" FontSize="11"/>
+                            </Canvas>
+                            <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12" CornerRadius="12" Background="#26354C" Padding="9,5">
+                                <StackPanel Orientation="Horizontal"><Ellipse x:Name="StatusDot" Width="7" Height="7" Fill="#98A2B3" Margin="0,0,7,0"/><TextBlock x:Name="ScanStatus" Text="BEKLEMEDE" Foreground="#E4E7EC" FontSize="10" FontWeight="Bold"/></StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <StackPanel Grid.Row="2" Margin="0,14,0,12">
+                        <TextBlock x:Name="ResultTitle" Text="Tarama bekleniyor" FontSize="19" FontWeight="Bold"/>
+                        <TextBlock x:Name="ResultSubtitle" Text="Bir fotoğraf seç, ardından eşleşme ara." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <Border Grid.Row="3" Background="#F8FAFC" BorderBrush="#E5E8F0" BorderThickness="1" CornerRadius="10" Padding="14">
+                        <StackPanel>
+                            <TextBlock Text="OLASI KİŞİ KAYDI" Foreground="#667085" FontWeight="Bold" FontSize="10"/>
+                            <TextBlock x:Name="CandidateName" Text="Henüz aday yok" FontSize="18" FontWeight="SemiBold" Margin="0,7,0,4"/>
+                            <TextBlock x:Name="CandidateDetails" Text="Eşleşme bulunduğunda bilgiler burada görünür." Foreground="{StaticResource Muted}" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="CandidateDistance" Foreground="{StaticResource Muted}" FontSize="11" Margin="0,5,0,0"/>
+                            <WrapPanel Margin="0,12,0,0">
+                                <Button x:Name="ConfirmButton" Content="Eşleşmeyi onayla ve kaydı aç" Style="{StaticResource PrimaryButton}" IsEnabled="False" Click="ConfirmMatch_Click"/>
+                                <Button x:Name="RejectButton" Content="Bu eşleşme değil" Margin="8,0,0,0" IsEnabled="False" Click="RejectMatch_Click"/>
+                            </WrapPanel>
+                            <TextBlock Text="Otomatik sonuç öneridir. Kaydı açmadan önce eşleşmeyi doğrula." Foreground="#98A2B3" FontSize="11" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+        <TextBlock Grid.Row="2" Margin="2,12,0,0" Foreground="#98A2B3" FontSize="11" Text="Fotoğraflar bu bilgisayarda kalır · Sonuçlar kesin kimlik doğrulaması değildir"/>
+    </Grid>
+</Window>
